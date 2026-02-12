@@ -1,0 +1,358 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+
+\title{CSC111 Project 1: Text Adventure Game\\
+\large The Missing Items Adventure}
+\author{Arian Mahlooji, Onuralp Eranil, Aryan Pournajafian}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{How to Run the Game}
+
+Execute the following command:
+
+\texttt{python adventure.py}
+
+\textbf{Requirements:} Python 3.13.5, no external libraries needed.
+
+\section{Game Map}
+
+The game consists of 12 locations based on the University of Toronto St. George campus.
+
+\subsection{Visual Map Layout}
+
+\textbf{Map Grid (6 rows x 5 columns):}
+
+\begin{verbatim}
+Row 1:  -1  -1  -1  -1  -1
+Row 2:  -1   6   5  -1  -1
+Row 3:  -1   9   3   4  -1
+Row 4:  -1   8   7  10  11
+Row 5:  -1  -1  -1   2  -1
+Row 6:  12  -1   0   1  -1
+
+Legend: -1 = No location
+Special Case: For going between 7/8 and 5/6
+The upper floor is at the left of the main floors.
+So going left and right between these locations means
+going up and down respectively.
+The Server Room (12) is in Bahen but it is only accessible after the requirements are met.
+\end{verbatim}
+
+\textbf{Starting Location:} Location 0 (Row 6, Column 3)
+
+\subsection{Geographic Accuracy}
+
+Based on real UofT St. George campus:
+
+\begin{itemize}
+\item \textbf{Chestnut (0,1,2):} Your dorm building and path to campus
+\item \textbf{King's College Circle (10):} Central founding location (ritual site!)
+\item \textbf{Gerstein (11):} East of King's College Circle
+\item \textbf{Robarts (5,6):} West side, north of Sidney Smith
+\item \textbf{St. George Street (4):} Main north-south road
+\item \textbf{Sidney Smith (3):} Contains Second Cup (9)
+\item \textbf{Bahen (7,8,12):} East of Sidney Smith, west of King's College
+\end{itemize}
+
+\subsection{Location Reference}
+
+\begin{itemize}[leftmargin=2cm]
+\item[\textbf{[0]}] Dorm Room - START \& final destination
+\item[\textbf{[1]}] Chestnut Hallway - Coffee here
+\item[\textbf{[2]}] Outside Chestnut - Path to campus
+\item[\textbf{[3]}] Sidney Smith Hall - Central hub
+\item[\textbf{[4]}] St. George Street North
+\item[\textbf{[5]}] Robarts Ground - Partner clues
+\item[\textbf{[6]}] Robarts Upper Stacks - USB Drive (BLUE GUARDIAN)
+\item[\textbf{[7]}] Bahen Ground - Keypad puzzle
+\item[\textbf{[8]}] BA3200 Lecture - Laptop Charger (SILVER CONDUCTOR)
+\item[\textbf{[9]}] Second Cup - Lucky Mug (GOLDEN VESSEL)
+\item[\textbf{[10]}] King's College Circle - RITUAL SITE:)
+\item[\textbf{[11]}] Gerstein Library - Partner watching
+\item[\textbf{[12]}] Server Room - Truth revealed
+\end{itemize}
+
+\section{Game Solution}
+
+The optimal solution requires exactly \textbf{20 movement commands} out of 28 allowed (or 33 with coffee bonus).
+
+\subsection{Complete Command Sequence}
+
+\textbf{The Ritual Mystery Solution (24 moves):}
+
+\textbf{STORY:} You must gather three items (Blue Guardian, Silver Conductor, Golden Vessel), perform the summoning ritual at King's College Circle, then take the backup USB home to win the game.
+
+\begin{enumerate}
+\item \texttt{go east} - Hallway (find the coffee)
+\item \texttt{take coffee} - FREE
+\item \texttt{drink coffee} - FREE (gives +5 moves bonus)
+\item \texttt{go north} - Outside Chestnut
+\item \texttt{go north} - King's College Circle (ritual site)
+\item \texttt{go west} - Bahen Center
+\item \texttt{go up} - BA3200 Lecture Hall
+\item \texttt{take laptop charger} - FREE (SILVER CONDUCTOR)
+\item \texttt{go down} - Back to Bahen
+\item \texttt{go north} - Sidney Smith
+\item \texttt{go north} - Robarts ground
+\item \texttt{go up} - Robarts upper stacks
+\item \texttt{take usb drive} - FREE (BLUE GUARDIAN)
+\item \texttt{go down} - Back to ground
+\item \texttt{go south} - Sidney Smith
+\item \texttt{go west} - Second Cup
+\item \texttt{take lucky mug} - FREE (GOLDEN VESSEL)
+\item \texttt{go east} - Back to Sidney Smith
+\item \texttt{go south} - Bahen
+\item \texttt{go east} - King's College Circle
+\item \texttt{drop usb drive} - Ritual begins...
+\item \texttt{drop laptop charger} - Energy builds...
+\item \texttt{drop lucky mug} - SUMMONING COMPLETE!
+\item \texttt{take backup\_usb} - FREE
+\item \texttt{go south} - Outside Chestnut
+\item \texttt{go south} - Hallway
+\item \texttt{go west} - Dorm room
+\item \texttt{drop backup\_usb} - Deposit backup
+\item \texttt{go east} - Get other items
+\item \texttt{go north}
+\item \texttt{go north} - Back to ritual circle
+\item \texttt{take laptop charger} - Retrieve charger
+\item \texttt{take lucky mug} - Retrieve mug
+\item \texttt{go south}
+\item \texttt{go south}
+\item \texttt{go west} - Back to dorm
+\item \texttt{drop laptop charger} - Final items
+\item \texttt{drop lucky mug} - YOU WIN!
+\end{enumerate}
+
+\textbf{Total:} 38 commands, 24 movement = 24 moves  
+\textbf{Limit:} 28 moves (33 with coffee)  
+\textbf{Buffer:} 4 moves (9 with coffee)
+
+\section{Lose Conditions}
+
+\subsection{Move Limit System}
+
+The player loses if they exceed the move limit before winning.
+
+\textbf{Base limit:} 28 moves \\
+\textbf{With coffee:} 33 moves \\
+\textbf{Optimal solution:} 20 moves \\
+\textbf{Buffer:} 8-13 moves for exploration
+
+\subsection{What Counts as a Move?}
+
+This is the most important mechanic in the game. ONLY movement commands count toward the limit.
+
+\textbf{Commands that COUNT (use 1 move):}
+\begin{itemize}
+\item \texttt{go north/south/east/west/up/down}
+\end{itemize}
+
+\textbf{Commands that are FREE (0 moves):}
+\begin{itemize}
+\item \texttt{look} - View description
+\item \texttt{inventory} - Check items
+\item \texttt{score} - See progress
+\item \texttt{log} - View history
+\item \texttt{take [item]} - Pick up
+\item \texttt{drop [item]} - Drop
+\item \texttt{examine [item]} - Inspect
+\item \texttt{talk to friend} - Dialogue
+\item \texttt{enter code} - Puzzle
+\item \texttt{drink coffee} - Consume
+\item \texttt{quit, help} - Meta
+\end{itemize}
+
+\subsection{Code Implementation}
+
+\textbf{File:} \texttt{adventure.py}
+
+\textbf{Constant:} \texttt{BASE\_MAX\_MOVES = 28} (line 18)
+
+\textbf{Variable:} \texttt{self.max\_moves} (increases with coffee)
+
+\textbf{Tracker:} \texttt{Player.moves\_made} in \texttt{game\_entities.py}
+
+\textbf{Increment:} ONLY \texttt{handle\_go\_command()} calls \texttt{player.increment\_moves()}
+
+\textbf{Check:} \texttt{check\_lose\_condition()} returns \texttt{player.moves\_made >= self.max\_moves}
+
+\section{Inventory}
+
+\subsection{Items and Locations}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Item} & \textbf{Start} & \textbf{Target} & \textbf{Pickup} & \textbf{Deposit} \\
+\midrule
+USB Drive & 6 & 0 & 5 pts & 30 pts \\
+Laptop Charger & 8 & 0 & 5 pts & 30 pts \\
+Lucky Mug & 11 & 0 & 5 pts & 30 pts \\
+Coffee & 2 & -- & 0 pts & -- \\
+Note & 9 & -- & 15 pts & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Example Commands}
+
+To get USB Drive and check inventory:
+
+\begin{verbatim}
+go north
+go north
+go east
+go up
+take usb drive
+inventory
+\end{verbatim}
+
+\textbf{Code:} \texttt{handle\_inventory\_command()} in \texttt{adventure.py}
+
+\section{Score}
+
+\subsection{Point Values}
+
+\textbf{Maximum possible:} 140 points
+
+\textbf{Required to win:} 105 points (3 items)
+
+\begin{itemize}
+\item Pick up USB Drive: 5 pts
+\item Deposit USB Drive: 30 pts
+\item Pick up Laptop Charger: 5 pts
+\item Deposit Laptop Charger: 30 pts
+\item Pick up Lucky Mug: 5 pts
+\item Deposit Lucky Mug: 30 pts
+\item Solve keypad puzzle: 20 pts (optional)
+\item Find note: 15 pts (optional)
+\end{itemize}
+
+\subsection{First Score Location}
+
+Location 6 (Robarts Study Floor) - taking USB Drive gives 5 points.
+
+\textbf{Code:} \texttt{Player.add\_score()} in \texttt{game\_entities.py}, called by \texttt{handle\_take\_command()} and \texttt{handle\_drop\_command()}
+
+\section{Enhancements}
+
+\subsection{Enhancement 1: Dynamic Stage Messages (HIGH Complexity)}
+
+\textbf{Complexity: HIGH}
+
+The game displays different messages based on your progress stage.
+
+\textbf{Game Stages:}
+\begin{enumerate}
+\item \textbf{Start}: Just beginning, haven't collected any items
+\item \textbf{Exploring}: Collected first sacred item
+\item \textbf{Gathering}: Working on collecting all 3 items
+\item \textbf{Ready Ritual}: All 3 items collected, ritual instructions appear
+\item \textbf{Ritual Done}: Ritual complete, backup USB acquired
+\item \textbf{Winning}: Taking backup USB home
+\end{enumerate}
+
+\textbf{Stage-Specific Messages:}
+\begin{itemize}
+\item \textbf{King's College Circle}: Different message for each stage
+  \begin{itemize}
+  \item Start: "The circle feels alive... waiting"
+  \item Gathering: "You have X of 3 items. Circle pulses..."
+  \item Ready: Full ritual instructions display!
+  \end{itemize}
+\item \textbf{Item Collection}: Progress tracking, remaining items listed
+\item \textbf{Gerstein Library}: Partner's sign changes based on stage
+\item \textbf{Server Room}: Full story revelation when accessed
+\end{itemize}
+
+\textbf{Why HIGH Complexity:}
+
+This enhancement was hard because it requires checking multiple 
+conditions across different parts of the game.
+
+The ritual on the King's Circle only happens if all three sacred
+items are all dropped at the right location. Therefore we had to
+track which items were collected, where they were dropped and whether
+the ritual already happened before.
+
+To make this enhancement, we needed a helper method (\texttt{\_check\_ritual})
+which looks at the items in the location and verifies that all required items are present. We also had to remove the original items,
+create the backup USB item, update its position and award points.
+
+\textbf{Code:} \texttt{check\_and\_display\_stage\_messages()}, \texttt{game\_stage}, \texttt{items\_collected}
+
+\subsection{Enhancement 2: Summoning Ritual (HIGH Complexity)}
+
+\textbf{Complexity: HIGH}
+
+Horror-movie-inspired ritual where items dissolve and merge into backup USB.
+
+\textbf{The Ritual:}
+\begin{itemize}
+\item Drop all 3 items at King's College Circle
+\item Dramatic summoning ceremony (ASCII art)
+\item Items dissolve into particles of light
+\item Merge into the backup USB
+\item Backup contains EVERYTHING (code + items' power)
+\item Just take backup USB home to win!
+\end{itemize}
+
+\textbf{Why HIGH:}
+
+This enhancement was also hard because it is a puzzle that interacts 
+with both user input and game state.
+
+The player must enter the correct 4-digit code to unlock the server 
+room. The program compares the given input from player to the stored puzzle code, handle incorrect attempts, give hints and only unlocks the door when the code is correct.
+
+Unlocking the door to the server room also changes the map by adding a new movement command.
+
+\textbf{Code:} \texttt{check\_ritual()}, \texttt{ritual\_complete}
+
+\subsection{Enhancement 3: Keypad Puzzle (MEDIUM Complexity)}
+
+\textbf{Complexity: MEDIUM}
+
+4-digit keypad at Bahen unlocks server room with story revelation.
+
+\textbf{The Puzzle:}
+\begin{itemize}
+\item Code: \textbf{1827} (UofT's actual founding year!)
+\item Clue: "When UofT was born, so was the code"
+\item Unlocks server room
+\item Reveals crucial story information
+\item Awards 20 points
+\end{itemize}
+
+\textbf{Purpose:} Explains why partner hid everything and shows the critical bug.
+
+\textbf{Why MEDIUM:}
+
+This enhancement is medium difficulty because it tracks player progress and and changes messages based on that progress, but it does not require complex algorithms.
+
+The game keeps track of which sacred items the player has collected using a set. Based on how many items are collected, the game updates the stage (start, exploring, gathering, ready\_ritual, ritual\_done).
+
+Then, when the player moves to certain locations, the program prints different messages depending on the current stage. This is handled using conditionals inside the helper method (\texttt{\_check\_stage\_messages}).
+
+
+\textbf{Code:} \texttt{handle\_keypad\_command()}
+
+
+Inspect items for detailed descriptions.
+
+\textbf{Command:} \texttt{examine [item]}
+
+\textbf{Code:} \texttt{handle\_examine\_command()}
+
+
+
+\end{document}
